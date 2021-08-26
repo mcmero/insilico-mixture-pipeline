@@ -12,30 +12,22 @@ assert len(sample_info) == 2
 assert(recipe.sample1.isin(sample_info.sample_name).all())
 assert(recipe.sample2.isin(sample_info.sample_name).all())
 
-s1_samples = recipe['sample1'].values
-s2_samples = recipe['sample2'].values
-
-s1_props = [str(p).split('.')[1] for p in recipe['prop1'].values]
-s2_props = [str(p).split('.')[1] for p in recipe['prop2'].values]
-
-s1_seeds = recipe['seed1'].values
-s2_seeds = recipe['seed2'].values
-
-samples = np.concatenate((s1_samples, s2_samples))
-props = np.concatenate((s1_props, s2_props))
-seeds = np.concatenate((s1_seeds, s2_seeds))
-
 # calculate preprocessing subsampling
 # required to normalise both bams for
 # consistent tumour coverage
-nrpcc = (sample_info['coverage'] / sample_info['ploidy']) * sample_info['purity']
-sub1 = round(nrpcc[0] / nrpcc[1], 4)
-sub2 = round(nrpcc[1] / nrpcc[0], 4)
+cov = sample_info.coverage.values
+ploidy = sample_info.ploidy.values
+purity = sample_info.purity.values
+nrpcc = (cov / ploidy) * purity
 
-pseeds = sample_info['seed'].values
-norms = [str(s).split('.')[1] if s < 1 else '0' for s in [sub1, sub2]]
-input_samples = sample_info.sample_name.values
-sample_info['norms'] = norms
+# we must normalise based on the ratio
+# or effective tumour coverage between
+# the samples. only one sample will need
+# normalisation, the other will the the
+# constant
+norm1 = round(nrpcc[0] / nrpcc[1], 4)
+norm2 = round(nrpcc[1] / nrpcc[0], 4)
+sample_info['norms'] = [norm1, norm2]
 
 # add these values back into the
 # recipe dataframe
@@ -52,6 +44,17 @@ recipe = recipe.merge(
     right_on='sample_name',
     suffixes=('_s1', '_s2')
 )
+
+recipe['norms_s1'] = [str(n).split('.')[1] if n < 1 else '0' for n in recipe.norms_s1.values]
+recipe['norms_s2'] = [str(n).split('.')[1] if n < 1 else '0' for n in recipe.norms_s2.values]
+recipe['prop1'] = [str(p).split('.')[1] for p in recipe.prop1.values]
+recipe['prop2'] = [str(p).split('.')[1] for p in recipe.prop2.values]
+
+samples = np.concatenate((recipe.sample1.values, recipe.sample2.values))
+norm_seeds = np.concatenate((recipe.seed_s1.values, recipe.seed_s2.values))
+norms = np.concatenate((recipe.norms_s1.values, recipe.norms_s2.values))
+seeds = np.concatenate((recipe.seed1.values, recipe.seed2.values))
+props = np.concatenate((recipe.prop1.values, recipe.prop2.values))
 
 print(
 '''

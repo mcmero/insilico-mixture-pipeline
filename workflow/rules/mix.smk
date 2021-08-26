@@ -2,7 +2,7 @@ rule preprocess:
     input:
         'input/{sample}.bam'
     output:
-        'results/preproc/{sample}_{pseed}.{norm}.bam'
+        'results/preproc/{sample}_{norm_seed}.{norm}.bam'
     threads:
         8
     envmodules:
@@ -13,15 +13,15 @@ rule preprocess:
         if [ {wildcards.norm} -eq 0 ]; then
             ln -s ../../{input} {output} ;
         else
-            samtools view -@ {threads} -s {wildcards.pseed}.{wildcards.norm} -b {input} > {output} ;
+            samtools view -@ {threads} -s {wildcards.norm_seed}.{wildcards.norm} -b {input} > {output} ;
         fi
         '''
 
 rule subsample:
     input:
-        'results/preproc/{sample}_{pseed}.{norm}.bam'
+        'results/preproc/{sample}_{norm_seed}.{norm}.bam'
     output:
-        'results/subsampled/{sample}_{pseed}.{norm}_{seed}.{prop}.bam',
+        'results/subsampled/{sample}_{norm_seed}.{norm}_{seed}.{prop}.bam',
     threads:
         8
     envmodules:
@@ -32,9 +32,9 @@ rule subsample:
 
 rule sort:
     input:
-        'results/subsampled/{sample}_{pseed}.{norm}_{seed}.{prop}.bam',
+        'results/subsampled/{sample}_{norm_seed}.{norm}_{seed}.{prop}.bam',
     output:
-        'results/subsampled-sorted/{sample}_{pseed}.{norm}_{seed}.{prop}.bam'
+        'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'
     threads:
         8
     envmodules:
@@ -45,9 +45,9 @@ rule sort:
 
 rule index:
     input:
-        'results/subsampled-sorted/{sample}_{pseed}.{norm}_{seed}.{prop}.bam'
+        'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'
     output:
-        'results/subsampled-sorted/{sample}_{pseed}.{norm}_{seed}.{prop}.bam.bai'
+        'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam.bai'
     threads:
         8
     envmodules:
@@ -59,17 +59,17 @@ rule index:
 rule merge:
     input:
         bams=[
-            'results/subsampled-sorted/{sample}_{pseed}.{norm}_{seed}.{prop}.bam'.format(
-                sample=sample, pseed=pseed, norm=norm, seed=seed, prop=prop
-             ) for sample, pseed, norm, seed, prop in zip(samples, pseeds, norms, seeds, props)
+            'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'.format(
+                sample=sample, norm_seed=norm_seed, norm=norm, seed=seed, prop=prop
+             ) for sample, norm_seed, norm, seed, prop in zip(samples, norm_seeds, norms, seeds, props)
         ],
         indexes=[
-            'results/subsampled-sorted/{sample}_{pseed}.{norm}_{seed}.{prop}.bam.bai'.format(
-                sample=sample, pseed=pseed, norm=norm, seed=seed, prop=prop
-             ) for sample, pseed, norm, seed, prop in zip(samples, pseeds, norms, seeds, props)
+            'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'.format(
+                sample=sample, norm_seed=norm_seed, norm=norm, seed=seed, prop=prop
+             ) for sample, norm_seed, norm, seed, prop in zip(samples, norm_seeds, norms, seeds, props)
         ],
     output:
-        'results/merged/{sample1}_{seed1}.{prop1}_{sample2}_{seed2}.{prop2}.bam'
+        'results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam'
     threads:
         8
     envmodules:
