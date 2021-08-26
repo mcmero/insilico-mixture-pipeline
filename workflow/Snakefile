@@ -1,0 +1,35 @@
+from snakemake.utils import min_version
+
+min_version('6.7.0')
+
+##### set minimum snakemake version #####
+
+configfile: 'config/config.yaml'
+
+##### load rules #####
+include: 'rules/common.smk'
+include: 'rules/mix.smk'
+
+##### workflow #####
+
+rule all:
+    input:
+        expand('results/subsampled-sorted/{sample}_{pseed}.{norm}_{seed}.{prop}.bam.bai',
+                zip,
+                sample=samples,
+                pseed=pseeds,
+                norm=norms,
+                seed=seeds,
+                prop=props),
+        expand('results/merged/{sample1}_{pseed1}.{norm1}_{seed1}.{prop1}_{sample2}_{pseed2}.{norm2}_{seed2}.{prop2}.bam',
+                zip,
+                sample1=recipe.sample1.values,
+                pseed1=recipe.seed_s1.values,
+                norm1=recipe.norms_s1.values,
+                seed1=recipe.seed1.values,
+                prop1=recipe.prop1.values,
+                sample2=recipe.sample2.values,
+                pseed2=recipe.seed_s2.values,
+                norm2=recipe.norms_s2.values,
+                seed2=recipe.seed2.values,
+                prop2=recipe.prop2.values)
