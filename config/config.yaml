@@ -1,4 +1,3 @@
 samples: config/samples.tsv
 twoclus_recipe: config/twoclus_recipe.tsv
-seeds: [7722, 6331]
-mem: 4G
+mem: 7G

@@ -5,6 +5,9 @@ rule preprocess:
         'results/preproc/{sample}_{norm_seed}.{norm}.bam'
     threads:
         8
+    resources:
+        mem_mb=65536,
+        runtime='1-0:0:0'
     envmodules:
         'gcc/8.3.0',
         'samtools/1.9'
@@ -21,9 +24,12 @@ rule subsample:
     input:
         'results/preproc/{sample}_{norm_seed}.{norm}.bam'
     output:
-        'results/subsampled/{sample}_{norm_seed}.{norm}_{seed}.{prop}.bam',
+        'results/subsampled/{norm_seed}.{norm}/{sample}_{seed}.{prop}.bam',
     threads:
         8
+    resources:
+        mem_mb=65536,
+        runtime='1-0:0:0'
     envmodules:
         'gcc/8.3.0',
         'samtools/1.9'
@@ -32,11 +38,14 @@ rule subsample:
 
 rule sort:
     input:
-        'results/subsampled/{sample}_{norm_seed}.{norm}_{seed}.{prop}.bam',
+        'results/subsampled/{norm_seed}.{norm}/{sample}_{seed}.{prop}.bam',
     output:
         'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'
     threads:
         8
+    resources:
+        mem_mb=65536,
+        runtime='1-0:0:0'
     envmodules:
         'gcc/8.3.0',
         'samtools/1.9'
@@ -50,6 +59,9 @@ rule index:
         'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam.bai'
     threads:
         8
+    resources:
+        mem_mb=65536,
+        runtime='1-0:0:0'
     envmodules:
         'gcc/8.3.0',
         'samtools/1.9'
@@ -72,6 +84,9 @@ rule merge:
         'results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam'
     threads:
         8
+    resources:
+        mem_mb=65536,
+        runtime='1-0:0:0'
     envmodules:
         'gcc/8.3.0',
         'samtools/1.9'
