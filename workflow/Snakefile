@@ -9,6 +9,7 @@ configfile: 'config/config.yaml'
 ##### load rules #####
 include: 'rules/common.smk'
 include: 'rules/mix.smk'
+include: 'rules/count.smk'
 
 ##### workflow #####
 
@@ -21,7 +22,19 @@ rule all:
                 norm=norms,
                 seed=seeds,
                 prop=props),
-        expand('results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam',
+        expand('results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam.bai',
+                zip,
+                sample1=recipe.sample1.values,
+                norm_seed1=recipe.seed_s1.values,
+                norm1=recipe.norms_s1.values,
+                seed1=recipe.seed1.values,
+                prop1=recipe.prop1.values,
+                sample2=recipe.sample2.values,
+                norm_seed2=recipe.seed_s2.values,
+                norm2=recipe.norms_s2.values,
+                seed2=recipe.seed2.values,
+                prop2=recipe.prop2.values),
+        expand('results/pileup/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}_pileup.vcf',
                 zip,
                 sample1=recipe.sample1.values,
                 norm_seed1=recipe.seed_s1.values,

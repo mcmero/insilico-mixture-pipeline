@@ -91,4 +91,20 @@ rule merge:
         'gcc/8.3.0',
         'samtools/1.9'
     shell:
-        'samtools merge -n -@ {threads} {output} {input.bams}'
+        'samtools cat {input.bams} | samtools sort -@ {threads} - -o {output}'
+
+rule index_merged:
+    input:
+        'results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam'
+    output:
+        'results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam.bai'
+    threads:
+        8
+    resources:
+        mem_mb=65536,
+        runtime='1-0:0:0'
+    envmodules:
+        'gcc/8.3.0',
+        'samtools/1.9'
+    shell:
+        'samtools index -@ {threads} {input}'

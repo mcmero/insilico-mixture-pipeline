@@ -1,3 +1,7 @@
 samples: config/samples.tsv
 twoclus_recipe: config/twoclus_recipe.tsv
+ref: ref/human_g1k_v37.fasta
 mem: 7G
+baseQ: 20
+mapQ: 20
+maxdepth: 8000
