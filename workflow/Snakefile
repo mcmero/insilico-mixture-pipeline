@@ -15,14 +15,14 @@ include: 'rules/count.smk'
 
 rule all:
     input:
-        expand('results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam.bai',
+        expand('results/subsampled/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam',
                 zip,
                 sample=samples,
                 norm_seed=norm_seeds,
                 norm=norms,
                 seed=seeds,
                 prop=props),
-        expand('results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam.bai',
+        expand('results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam',
                 zip,
                 sample1=recipe.sample1.values,
                 norm_seed1=recipe.seed_s1.values,

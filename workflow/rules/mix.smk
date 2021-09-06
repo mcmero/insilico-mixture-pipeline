@@ -24,7 +24,7 @@ rule subsample:
     input:
         'results/preproc/{sample}_{norm_seed}.{norm}.bam'
     output:
-        'results/subsampled/{norm_seed}.{norm}/{sample}_{seed}.{prop}.bam',
+        'results/subsampled/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam',
     threads:
         8
     resources:
@@ -36,50 +36,13 @@ rule subsample:
     shell:
         'samtools view -@ {threads} -s {wildcards.seed}.{wildcards.prop} -b {input} > {output}'
 
-rule sort:
-    input:
-        'results/subsampled/{norm_seed}.{norm}/{sample}_{seed}.{prop}.bam',
-    output:
-        'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'
-    threads:
-        8
-    resources:
-        mem_mb=65536,
-        runtime='1-0:0:0'
-    envmodules:
-        'gcc/8.3.0',
-        'samtools/1.9'
-    shell:
-        'samtools sort -@ {threads} -m {config[mem]} {input} -o {output}'
-
-rule index:
-    input:
-        'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'
-    output:
-        'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam.bai'
-    threads:
-        8
-    resources:
-        mem_mb=65536,
-        runtime='1-0:0:0'
-    envmodules:
-        'gcc/8.3.0',
-        'samtools/1.9'
-    shell:
-        'samtools index -@ {threads} {input}'
-
 rule merge:
     input:
         bams=[
-            'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'.format(
+            'results/subsampled/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'.format(
                 sample=sample, norm_seed=norm_seed, norm=norm, seed=seed, prop=prop
              ) for sample, norm_seed, norm, seed, prop in zip(samples, norm_seeds, norms, seeds, props)
-        ],
-        indexes=[
-            'results/subsampled-sorted/{norm_seed}.{norm}_{seed}/{sample}_0.{prop}.bam'.format(
-                sample=sample, norm_seed=norm_seed, norm=norm, seed=seed, prop=prop
-             ) for sample, norm_seed, norm, seed, prop in zip(samples, norm_seeds, norms, seeds, props)
-        ],
+        ]
     output:
         'results/merged/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}.bam'
     threads:
