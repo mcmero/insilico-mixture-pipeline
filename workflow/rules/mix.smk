@@ -54,7 +54,12 @@ rule merge:
         'gcc/8.3.0',
         'samtools/1.9'
     shell:
-        'samtools cat {input.bams} | samtools sort -@ {threads} - -o {output}'
+        '''
+        samtools cat \
+            results/subsampled/{wildcards.norm_seed1}.{wildcards.norm1}_{wildcards.norm_seed1}/{wildcards.sample1}_0.{wildcards.prop1}.bam \
+            results/subsampled/{wildcards.norm_seed2}.{wildcards.norm2}_{wildcards.norm_seed2}/{wildcards.sample2}_0.{wildcards.prop2}.bam \
+            | samtools sort -@ {threads} - -o {output}
+        '''
 
 rule index_merged:
     input:
