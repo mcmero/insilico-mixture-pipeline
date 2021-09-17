@@ -33,5 +33,5 @@ rule mpileup:
     shell:
         '''
         bcftools mpileup -B -A -d{config[maxdepth]} -f {config[ref]} \
-            -q{config[baseQ]} -Q{config[mapQ]} -R {input.bed} {input.bam} > {output}
+            -q{config[baseQ]} -Q{config[mapQ]} -R {input.bed} -a AD {input.bam} > {output}
         '''
