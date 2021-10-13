@@ -49,16 +49,18 @@ rule merge:
         8
     resources:
         mem_mb=65536,
-        runtime='1-0:0:0'
+        runtime='3-0:0:0'
     envmodules:
         'gcc/8.3.0',
         'samtools/1.9'
+    params:
+        mem_per_thread='7G'
     shell:
         '''
         samtools cat \
             results/subsampled/{wildcards.norm_seed1}.{wildcards.norm1}_{wildcards.norm_seed1}/{wildcards.sample1}_0.{wildcards.prop1}.bam \
             results/subsampled/{wildcards.norm_seed2}.{wildcards.norm2}_{wildcards.norm_seed2}/{wildcards.sample2}_0.{wildcards.prop2}.bam \
-            | samtools sort -@ {threads} - -o {output}
+            | samtools sort -m {params.mem_per_thread} -@ {threads} - -o {output}
         '''
 
 rule index_merged:

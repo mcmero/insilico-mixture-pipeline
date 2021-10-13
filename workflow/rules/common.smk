@@ -63,7 +63,7 @@ print(
 )
 for idx, row in recipe.iterrows():
     print(
-        'sample 1: %s, sample 2: %s, prop1: %s, prop2: %s' % \
+        'sample 1: %s, sample 2: %s, prop1: 0.%s, prop2: 0.%s' % \
         (row['sample1'], row['sample2'], row['prop1'], row['prop2'])
         )
 print(
