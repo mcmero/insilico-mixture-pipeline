@@ -22,8 +22,9 @@ rule mpileup:
         bed='input/{sample1}_{sample2}_mutations.bed'
     output:
         'results/pileup/{norm_seed1}.{norm1}_{norm_seed2}.{norm2}/{sample1}_0.{prop1}_{sample2}_0.{prop2}_pileup.vcf'
+    log:
+        'logs/mpileup_{norm_seed1}.{norm1}_{norm_seed2}.{norm2}_{sample1}_0.{prop1}_{sample2}_0.{prop2}.log'
     envmodules:
-        'gcc/8.3.0',
         'bcftools/1.9'
     threads:
         1
